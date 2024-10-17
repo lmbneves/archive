@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, SafeAreaView, ScrollView, View, TextInput } from 'react-native';
+import { Button, SafeAreaView, ScrollView, View, TextInput, Pressable } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList  } from '../navigation/types';
 import { ArchiveEntryComponent } from '../components/ArchiveEntry';
 import { Archive } from '../models'
 import { getDBConnection, createTable, deleteTable, getArchives, saveArchives, deleteArchive } from '../services/db-service';
 import uuid from 'react-native-uuid';
 
-function Home(): React.JSX.Element {
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [archives, setArchives] = useState<Archive[]>([]);
   const [newArchive, setNewArchive] = useState('');
 
@@ -61,7 +65,14 @@ function Home(): React.JSX.Element {
       <ScrollView>
         <View>
           {archives.map((archive) => (
-            <ArchiveEntryComponent key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
+            <Pressable
+              onPress={() => 
+                navigation.navigate('Archive', { archive: archive })
+              }
+            >
+              <ArchiveEntryComponent key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
+            </Pressable>
+            // <ArchiveEntryComponent key={archive.id} archive={archive} />
           ))}
         </View>
         <View>
@@ -78,4 +89,4 @@ function Home(): React.JSX.Element {
   );
 }
 
-export default Home;
+export default HomeScreen;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Text, Pressable, View, StyleSheet } from 'react-native';
 import { Archive } from '../models';
 
 export const ArchiveEntryComponent: React.FC<{
@@ -9,18 +9,31 @@ export const ArchiveEntryComponent: React.FC<{
 }> = ({ archive: {id, name}, deleteArchiveEntry}) => {
 
     return (
-      <View>
-        <View>
+      <View
+        style={styles.container}
+        // onPress={gotoArchiveView}
+      >
           <Text>
-            {id}: {name}
+            {name} ({id})
           </Text>
-          <Button
+          {/* <Button
             onPress={() => deleteArchiveEntry(id)}
-            title="done"
-            color="#841584"
-            accessibilityLabel="add todo item"
-          />
-        </View>
+            title="remove"
+            color="#007AFF"
+            accessibilityLabel="remove archive"
+          /> */}
       </View>
     );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginLeft: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    borderColor: '#ccc',
+    borderBottomWidth: 1,
+  }
+})
