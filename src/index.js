@@ -1,5 +1,7 @@
-import Home from './screens/Home'
+import HomeScreen from './screens/HomeScreen'
+import ArchiveScreen from './screens/ArchiveScreen'
 
 export {
-  Home
+  HomeScreen, 
+  ArchiveScreen
 }
