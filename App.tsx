@@ -25,6 +25,9 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Archive"
           component={ ArchiveScreen }
+          options={({ route }) => ({
+            title: route.params?.archive.name || 'Archive'
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
