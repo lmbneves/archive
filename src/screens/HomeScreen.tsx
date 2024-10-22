@@ -66,6 +66,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View>
           {archives.map((archive) => (
             <Pressable
+              key={archive.id}
               onPress={() => 
                 navigation.navigate('Archive', { archive: archive })
               }

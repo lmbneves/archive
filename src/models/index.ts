@@ -3,7 +3,7 @@ export type Archive = {
   name: string;
 };
 
-export type ArchiveItem = {
+export type Item = {
   id: string;
   name: string;
 };
