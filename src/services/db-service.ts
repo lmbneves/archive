@@ -14,23 +14,21 @@ export const createTable = async (db: SQLiteDatabase) => {
   await db.executeSql(`CREATE TABLE IF NOT EXISTS ${archiveTable}(
     id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL
-  );`)
-  .then(() => {
-    db.executeSql(`CREATE TABLE IF NOT EXISTS ${itemTable}(
-      id TEXT PRIMARY KEY NOT NULL,
-      aid TEXT NOT NULL,
-      name TEXT NOT NULL
-      FOREIGN KEY (aid)
-        REFERENCES Archive (id)
-    );`)
-  })
-  ;
+  ) WITHOUT ROWID;`);
+
+  await db.executeSql(`CREATE TABLE IF NOT EXISTS ${itemTable}(
+    id TEXT PRIMARY KEY NOT NULL,
+    archive_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    FOREIGN KEY (archive_id)
+      REFERENCES Archive (id)
+  ) WITHOUT ROWID;`);
 };
 
 export const getArchives = async (db: SQLiteDatabase): Promise<Archive[]> => {
   try {
     const archives: Archive[] = [];
-    const results = await db.executeSql(`SELECT rowid as id,name FROM ${archiveTable}`);
+    const results = await db.executeSql(`SELECT id as id,name FROM ${archiveTable}`);
     results.forEach((result: SQLiteDatabase) => { // idk about this type cast
       for (let index = 0; index < result.rows.length; index++) {
         archives.push(result.rows.item(index))
@@ -56,10 +54,10 @@ export const deleteArchive = async (db: SQLiteDatabase, id: string) => {
   await db.executeSql(deleteQuery);
 };
 
-export const getItems = async (db: SQLiteDatabase, aid: string): Promise<Item[]> => {
+export const getItems = async (db: SQLiteDatabase, archive_id: string): Promise<Item[]> => {
   try {
     const items: Item[] = [];
-    const results = await db.executeSql(`SELECT rowid as id,name FROM ${itemTable} where aid = '${aid}'`);
+    const results = await db.executeSql(`SELECT id as id,name FROM ${itemTable} where archive_id = '${archive_id}'`);
     results.forEach((result: SQLiteDatabase) => { // idk about this type cast
       for (let index = 0; index < result.rows.length; index++) {
         items.push(result.rows.item(index))
@@ -68,14 +66,14 @@ export const getItems = async (db: SQLiteDatabase, aid: string): Promise<Item[]>
     return items;
   } catch (error) {
     console.error(error);
-    throw Error(`Error retrieving items from Archive (${aid}).`);
+    throw Error(`Error retrieving items from Archive (${archive_id}).`);
   }
 };
 
-export const saveItems = async (db: SQLiteDatabase, aid: string, items: Item[]) => {
+export const saveItems = async (db: SQLiteDatabase, archive_id: string, items: Item[]) => {
   const insertQuery =
-    `INSERT OR REPLACE INTO ${itemTable}(id, name, aid) values` +
-    items.map(i => `('${i.id}', '${i.name}', '${aid}')`).join(',');
+    `INSERT OR REPLACE INTO ${itemTable}(id, name, archive_id) values` +
+    items.map(i => `('${i.id}', '${i.name}', '${archive_id}')`).join(',');
 
   return db.executeSql(insertQuery);
 };

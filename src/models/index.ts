@@ -5,5 +5,6 @@ export type Archive = {
 
 export type Item = {
   id: string;
+  archive_id: string;
   name: string;
 };

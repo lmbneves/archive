@@ -37,7 +37,7 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
     if (!newItem.trim()) return;
     try {
       const newItems = [...items, {
-        id: uuid.v4() as string, name: newItem
+        id: uuid.v4() as string, archive_id: route.params.archive.id, name: newItem
       }];
       setItems(newItems);
       const db = await getDBConnection();
@@ -54,11 +54,12 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
         <View>
           {items.map((item) => (
             <Pressable
+              key={item.id}
               // onPress={() => 
               //   navigation.navigate('Archive', { archive: archive })
               // }
             >
-              <ItemEntryComponent key={item.id} item={item} />
+              <ItemEntryComponent item={item} />
             </Pressable>
           ))}
         </View>
