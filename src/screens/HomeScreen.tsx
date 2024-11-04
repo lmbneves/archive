@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, SafeAreaView, ScrollView, View, TextInput, Pressable } from 'react-native';
+import { Button, SafeAreaView, ScrollView, View, Pressable } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
 import { ArchiveEntryComponent } from '../components/ArchiveEntry';
+import { AddModal } from '../components/AddModal';
 import { Archive } from '../models'
-import { getDBConnection, createTable, deleteTable, getArchives, saveArchives, deleteArchive } from '../services/db-service';
+import { getDBConnection, createTable, getArchives, saveArchives, deleteArchive } from '../services/db-service';
 import uuid from 'react-native-uuid';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -12,6 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [archives, setArchives] = useState<Archive[]>([]);
   const [newArchive, setNewArchive] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const loadDataCallback = useCallback(async () => {
     try {
@@ -32,20 +34,20 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, []);
 
-  useEffect(() => {
-    loadDataCallback();
-  }, [loadDataCallback]);
-
-  const addArchiveEntry = async () => {
-    if (!newArchive.trim()) return;
+  const handleModalNewArchive = (name: string) => {
+    addArchiveEntry(name);
+    setModalVisible(false);
+  };
+  const addArchiveEntry = async (name: string) => {
+    if (!name.trim()) return;
     try {
       const newArchives = [...archives, {
-        id: uuid.v4() as string, name: newArchive
+        id: uuid.v4() as string, name: name
       }];
       setArchives(newArchives);
       const db = await getDBConnection();
-      await saveArchives(db, newArchives);
-      setNewArchive('');
+      await saveArchives(db, newArchives)
+      // setNewArchive('');
     } catch (error) {
       console.error(error);
     }
@@ -59,6 +61,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    loadDataCallback();
+  }, [loadDataCallback]);
   
   return (
     <SafeAreaView>
@@ -73,16 +79,18 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             >
               <ArchiveEntryComponent key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
             </Pressable>
-            // <ArchiveEntryComponent key={archive.id} archive={archive} />
           ))}
         </View>
         <View>
-          <TextInput value={newArchive} onChangeText={text => setNewArchive(text)} />
           <Button
-            onPress={addArchiveEntry}
+            onPress={() => setModalVisible(true)}
             color="#841584"
-            accessibilityLabel="add archive"
-            title="Add new archive"
+            accessibilityLabel="open add archive modal"
+            title="Create archive"
+          />
+          <AddModal
+            isVisible={modalVisible}
+            setInputValue={handleModalNewArchive}
           />
         </View>
       </ScrollView>
