@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Button, Text, TextInput, View, Pressable } from 'react-native';
+import { SafeAreaView, ScrollView, Button, TextInput, View, Pressable } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
-import { getDBConnection, createTable, deleteTable, getItems, saveItems, deleteItem } from '../services/db-service';
+import { getDBConnection, createTable, getItems, saveItems } from '../services/db-service';
 import { ItemEntryComponent } from '../components/ItemEntryComponent';
+import { AddModal } from '../components/AddModal';
 import { Item } from '../models';
 import uuid from 'react-native-uuid';
 
@@ -12,6 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Archive'>;
 const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const loadDataCallback = useCallback(async () => {
     try {
@@ -29,15 +31,15 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, []);
 
-  useEffect(() => {
-    loadDataCallback();
-  }, [loadDataCallback]);
-
-  const addItemEntry = async () => {
-    if (!newItem.trim()) return;
+  const handleModalNewItem = (name: string) => {
+    addItemEntry(name);
+    setModalVisible(false);
+  };
+  const addItemEntry = async (name: string) => {
+    if (!name.trim()) return;
     try {
       const newItems = [...items, {
-        id: uuid.v4() as string, archive_id: route.params.archive.id, name: newItem
+        id: uuid.v4() as string, archive_id: route.params.archive.id, name: name
       }];
       setItems(newItems);
       const db = await getDBConnection();
@@ -47,6 +49,10 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    loadDataCallback();
+  }, [loadDataCallback]);
 
   return (
     <SafeAreaView>
@@ -64,13 +70,16 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
           ))}
         </View>
         <View>
-          <TextInput value={newItem} onChangeText={text => setNewItem(text)} />
           <Button
-            onPress={addItemEntry}
-            color="#841584"
-            accessibilityLabel="add item to archive"
-            title="Add new item to archive"
-          />
+              onPress={() => setModalVisible(true)}
+              color="#841584"
+              accessibilityLabel="open add item modal"
+              title="Add item to archive"
+            />
+            <AddModal
+              isVisible={modalVisible}
+              setInputValue={handleModalNewItem}
+            />
         </View>
       </ScrollView>
     </SafeAreaView>
