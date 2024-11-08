@@ -1,10 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Button, TextInput, View, Pressable } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Button, View, Pressable } from 'react-native';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetTextInput,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
 import { getDBConnection, createTable, getItems, saveItems } from '../services/db-service';
 import { ItemEntryComponent } from '../components/ItemEntryComponent';
-import { AddModal } from '../components/AddModal';
 import { Item } from '../models';
 import uuid from 'react-native-uuid';
 
@@ -13,7 +18,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Archive'>;
 const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [placeholderText, setPlaceholderText] = useState(`Add to ${route.params.archive.name}...`)
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ["15%"], []);
 
   const loadDataCallback = useCallback(async () => {
     try {
@@ -30,16 +38,26 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
       console.error(error);
     }
   }, []);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handlePresentModalDismiss = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    // console.log('handleSheetChanges', index);
+  }, []);
 
-  const handleModalNewItem = (name: string) => {
-    addItemEntry(name);
-    setModalVisible(false);
+  const handleCreateItemSubmit = () => {
+    addItemEntry();
+    // chain these actions?
+    handlePresentModalDismiss();
   };
-  const addItemEntry = async (name: string) => {
-    if (!name.trim()) return;
+  const addItemEntry = async () => {
+    if (!newItem.trim()) return;
     try {
       const newItems = [...items, {
-        id: uuid.v4() as string, archive_id: route.params.archive.id, name: name
+        id: uuid.v4() as string, archive_id: route.params.archive.id, name: newItem
       }];
       setItems(newItems);
       const db = await getDBConnection();
@@ -55,35 +73,62 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [loadDataCallback]);
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View>
-          {items.map((item) => (
-            <Pressable
-              key={item.id}
-              // onPress={() => 
-              //   navigation.navigate('Archive', { archive: archive })
-              // }
-            >
-              <ItemEntryComponent item={item} />
-            </Pressable>
-          ))}
-        </View>
-        <View>
-          <Button
-              onPress={() => setModalVisible(true)}
-              color="#841584"
-              accessibilityLabel="open add item modal"
-              title="Add item to archive"
+    <BottomSheetModalProvider>
+      <SafeAreaView>
+        <ScrollView>
+          <View>
+            {items.map((item) => (
+              <Pressable
+                key={item.id}
+                // onPress={() => 
+                //   navigation.navigate('Archive', { archive: archive })
+                // }
+              >
+                <ItemEntryComponent item={item} />
+              </Pressable>
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      <Button
+        onPress={handlePresentModalPress}
+        title="Add item"
+        color="black"
+      />
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        onChange={handleSheetChanges}
+        snapPoints={snapPoints}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <View>
+            <BottomSheetTextInput
+              style={styles.textInput}
+              value={newItem}
+              onChangeText={setNewItem}
+              onSubmitEditing={handleCreateItemSubmit}
+              placeholder={placeholderText}
+              autoFocus
             />
-            <AddModal
-              isVisible={modalVisible}
-              setInputValue={handleModalNewItem}
-            />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+    marginLeft: 15,
+    marginRight: 15
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    padding: 10,
+    marginBottom: 10,
+  },
+});
 
 export default ArchiveScreen;
