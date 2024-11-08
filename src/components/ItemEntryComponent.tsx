@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Text, Pressable, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Item } from '../models';
 
 export const ItemEntryComponent: React.FC<{
@@ -15,12 +15,6 @@ export const ItemEntryComponent: React.FC<{
           <Text>
             {name} ({id})
           </Text>
-          {/* <Button
-            onPress={() => deleteArchiveEntry(id)}
-            title="remove"
-            color="#007AFF"
-            accessibilityLabel="remove archive"
-          /> */}
       </View>
     );
 };
