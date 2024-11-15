@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BottomSheetModal,
@@ -6,6 +6,7 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
 import { ArchiveEntryComponent } from '../components/ArchiveEntry';
@@ -16,9 +17,9 @@ import uuid from 'react-native-uuid';
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
-  const [archives, setArchives] = useState<Archive[]>([]);
-  const [newArchive, setNewArchive] = useState('');
+  const { archives, updateState } = useContext(AppContext);
 
+  const [newArchive, setNewArchive] = useState('');
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["15%"], []);
 
@@ -31,10 +32,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       await createTable(db);
       const storedArchives = await getArchives(db);
       if (storedArchives.length) {
-        setArchives(storedArchives);
+        updateState({ archives: storedArchives });
       } else {
         await saveArchives(db, initArchives);
-        setArchives(initArchives);
+        updateState({ archives: initArchives });
       }
     } catch (error) {
       console.error(error);
@@ -51,19 +52,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const handleCreateArchiveSubmit = () => {
-    addArchiveEntry();
+    addArchive();
     // chain these actions?
     handlePresentModalDismiss();
   };
 
-  const addArchiveEntry = async () => {
+  const addArchive = async () => {
     handlePresentModalPress();
     if (!newArchive.trim()) return;
     try {
-      const newArchives = [...archives, {
+      const newArchives = [...(archives as Archive[]), {
         id: uuid.v4() as string, name: newArchive
       }];
-      setArchives(newArchives);
+      updateState({ archives: newArchives });
       const db = await getDBConnection();
       await saveArchives(db, newArchives)
       setNewArchive('');
@@ -75,7 +76,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     try {
       const db = await getDBConnection();
       await deleteArchive(db, id);
-      setArchives(archives.filter(archive => archive.id != id));
+      const newArchives = archives?.filter(archive => archive.id != id);
+      updateState({ archives: newArchives });
     } catch (error) {
       console.error(error);
     }
@@ -90,7 +92,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <SafeAreaView>
         <ScrollView>
           <View>
-            {archives.map((archive) => (
+            {archives?.map((archive) => (
               <Pressable
                 key={archive.id}
                 onPress={() => 

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { AppContextProvider } from './src/context/app-context-provider';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -17,23 +18,25 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen
-            name="Home"
-            component={ HomeScreen }
-          />
-          <Stack.Screen
-            name="Archive"
-            component={ ArchiveScreen }
-            options={({ route }) => ({
-              title: route.params?.archive.name || 'Archive'
-            })}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <AppContextProvider>
+      <GestureHandlerRootView style={styles.container}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen
+              name="Home"
+              component={ HomeScreen }
+            />
+            <Stack.Screen
+              name="Archive"
+              component={ ArchiveScreen }
+              options={({ route }) => ({
+                title: route.params?.archive.name || 'Archive'
+              })}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </AppContextProvider>
   );
 }
 
