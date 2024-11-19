@@ -15,6 +15,7 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { Trash2 } from 'lucide-react-native';
 import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
@@ -22,6 +23,7 @@ import { getDBConnection, createTable, getItems, saveItems, deleteArchive } from
 import { ItemEntryComponent } from '../components/ItemEntryComponent';
 import { Item } from '../models';
 import uuid from 'react-native-uuid';
+import { red } from 'react-native-reanimated/lib/typescript/Colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Archive'>;
 
@@ -157,11 +159,11 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
         snapPoints={snapPointsMenu}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <View>
-            <Button 
-              title="Delete archive"
-              onPress={() => setConfirmModalVisible(true)}
-            />
+          <View style={styles.menuContainer}>
+            <Pressable style={styles.menuAction} onPress={() => setConfirmModalVisible(true)} >
+              <Trash2 size="20" color="#fe3434" />
+              <Text style={styles.menuActionLabel}>Delete archive</Text>
+            </Pressable>
           </View>
         </BottomSheetView>
       </BottomSheetModal>
@@ -228,6 +230,19 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     color: 'red',
+  },
+  menuContainer: {
+    marginLeft: 10,
+    marginTop: 20
+  },
+  menuAction: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+  },
+  menuActionLabel: {
+    marginLeft: 14,
+    fontSize: 18,
+    color: 'red'
   }
 });
 

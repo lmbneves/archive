@@ -61,7 +61,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     handlePresentModalPress();
     if (!newArchive.trim()) return;
     try {
-      const newArchives = [...(archives as Archive[]), {
+      const newArchives = [...archives as Archive[], {
         id: uuid.v4() as string, name: newArchive
       }];
       updateState({ archives: newArchives });
