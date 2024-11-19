@@ -1,16 +1,16 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { Archive } from '../models';
+import { StyleSheet, Text, View } from 'react-native';
+import { Item } from '../models';
 
-export const ArchiveEntryComponent: React.FC<{
-  archive: Archive;
-  deleteArchiveEntry: Function;
+export const ItemEntryComponent: React.FC<{
+  item: Item;
 
-}> = ({ archive: {id, name}, deleteArchiveEntry}) => {
+}> = ({ item: {id, name} }) => {
 
     return (
       <View
         style={styles.container}
+        // onPress={gotoArchiveView}
       >
           <Text>
             {name} ({id})

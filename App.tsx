@@ -7,31 +7,45 @@
 
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { AppContextProvider } from './src/context/app-context-provider';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './src/navigation/types';
 import { HomeScreen, ArchiveScreen } from './src'
 
 const Stack = createNativeStackNavigator<RootStackParamList>(); 
 
-function App(): React.JSX.Element {
+export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={ HomeScreen }
-        />
-        <Stack.Screen
-          name="Archive"
-          component={ ArchiveScreen }
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AppContextProvider>
+      <GestureHandlerRootView style={styles.container}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen
+              name="Home"
+              component={ HomeScreen }
+            />
+            <Stack.Screen
+              name="Archive"
+              component={ ArchiveScreen }
+              options={({ route }) => ({
+                title: route.params?.archive.name || 'Archive'
+              })}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </AppContextProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'grey',
+  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -49,5 +63,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
-export default App;
