@@ -54,6 +54,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const handleCreateArchiveSubmit = () => {
     addArchive();
     // chain these actions?
+    setNewArchive('');
     handlePresentModalDismiss();
   };
 
@@ -61,13 +62,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     handlePresentModalPress();
     if (!newArchive.trim()) return;
     try {
-      const newArchives = [...archives as Archive[], {
-        id: uuid.v4() as string, name: newArchive
-      }];
+      const archive = { id: uuid.v4() as string, name: newArchive };
+      const newArchives = archives ? [...archives as Archive[], archive ] : [ archive ];
       updateState({ archives: newArchives });
       const db = await getDBConnection();
-      await saveArchives(db, newArchives)
-      setNewArchive('');
+      await saveArchives(db, newArchives);
     } catch (error) {
       console.error(error);
     }
