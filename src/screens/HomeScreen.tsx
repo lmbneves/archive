@@ -9,7 +9,7 @@ import {
 import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
-import { ArchiveEntryComponent } from '../components/ArchiveEntry';
+import { ArchiveTile } from '../components/ArchiveTile';
 import { Archive } from '../models'
 import { getDBConnection, createTable, getArchives, saveArchives, deleteArchive } from '../services/db-service';
 import uuid from 'react-native-uuid';
@@ -90,7 +90,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     <BottomSheetModalProvider>
       <SafeAreaView>
         <ScrollView>
-          <View>
+          <View style={styles.archiveList}>
             {archives?.map((archive) => (
               <Pressable
                 key={archive.id}
@@ -98,7 +98,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   navigation.navigate('Archive', { archive: archive })
                 }
               >
-                <ArchiveEntryComponent key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
+                <ArchiveTile key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
               </Pressable>
             ))}
           </View>
@@ -136,6 +136,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 15,
     marginRight: 15
+  },
+  archiveList: {
+    flex: 1,
+    margin: 15,
   },
   textInput: {
     borderWidth: 1,
