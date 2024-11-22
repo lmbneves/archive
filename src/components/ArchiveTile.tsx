@@ -1,13 +1,12 @@
 import React from 'react';
 import { Text, View, StyleSheet, Pressable } from 'react-native';
-import { EllipsisVertical, LeafyGreen } from 'lucide-react-native';
+import { LeafyGreen } from 'lucide-react-native';
 import { Archive } from '../models';
 
 export const ArchiveTile: React.FC<{
   archive: Archive;
-  deleteArchiveEntry: Function;
 
-}> = ({ archive: {id, name}, deleteArchiveEntry}) => {
+}> = ({ archive: {id, name}}) => {
 
   return (
     <View style={styles.tileContainer}>
@@ -16,11 +15,6 @@ export const ArchiveTile: React.FC<{
         <Text style={styles.title}>
           {name}
         </Text>
-      </View>
-      <View style={styles.tileMenu}>
-        <Pressable>
-          <EllipsisVertical size="16" />
-        </Pressable>
       </View>
     </View>
   );
@@ -47,9 +41,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row', 
     alignItems: 'center'
-  },
-  tileMenu: {
-
   },
   title: {
     marginLeft: 12,

@@ -98,7 +98,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   navigation.navigate('Archive', { archive: archive })
                 }
               >
-                <ArchiveTile key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
+                <ArchiveTile key={archive.id} archive={archive} />
               </Pressable>
             ))}
           </View>
