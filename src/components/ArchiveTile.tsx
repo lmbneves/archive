@@ -1,12 +1,12 @@
 import React from 'react';
-import { Text, View, StyleSheet, Pressable } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { LeafyGreen } from 'lucide-react-native';
 import { Archive } from '../models';
 
 export const ArchiveTile: React.FC<{
   archive: Archive;
 
-}> = ({ archive: {id, name}}) => {
+}> = ({ archive: {name}}) => {
 
   return (
     <View style={styles.tileContainer}>
@@ -21,11 +21,6 @@ export const ArchiveTile: React.FC<{
 };
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    marginLeft: 15,
-    marginRight: 15
-  },
   tileContainer: {
     flex: 1,
     marginBottom: 15,  
