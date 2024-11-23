@@ -1,11 +1,12 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { Plus } from 'lucide-react-native';
 import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
@@ -101,14 +102,18 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 <ArchiveTile key={archive.id} archive={archive} />
               </Pressable>
             ))}
-          </View>
+            <Pressable 
+              onPress={handlePresentModalPress}
+              style={styles.createArchiveButton}
+            >
+              <View style={styles.createArchiveButtonWrapper}>
+                <Plus size="16" style={styles.createArchiveButtonIcon} />
+                <Text style={styles.createArchiveButtonLabel}>Create archive</Text>
+              </View>
+            </Pressable>
+          </View>          
         </ScrollView>
       </SafeAreaView>
-      <Button
-        onPress={handlePresentModalPress}
-        title="Create archive"
-        color="black"
-      />
       <BottomSheetModal
         ref={bottomSheetModalRef}
         onChange={handleSheetChanges}
@@ -141,11 +146,34 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 15,
   },
+  createArchiveButton: {
+    flex: 1,
+    marginBottom: 15,  
+    padding: 20,  
+    backgroundColor: 'white',
+    borderColor: 'bbb',
+    borderRadius: 6,
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  createArchiveButtonWrapper: {
+    flex: 1,
+    flexDirection: 'row', 
+    alignItems: 'center'
+  },
+  createArchiveButtonIcon: {
+    minWidth: 25,
+    marginRight: 5
+  },
+  createArchiveButtonLabel: {
+    fontSize: 16
+  },
   textInput: {
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 10
   },
 });
 
