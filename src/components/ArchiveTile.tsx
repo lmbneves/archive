@@ -11,7 +11,7 @@ export const ArchiveTile: React.FC<{
   return (
     <View style={styles.tileContainer}>
       <View style={styles.tileDetail}>
-        <LeafyGreen size="16" />
+        <LeafyGreen size="16" style={styles.tileIcon}/>
         <Text style={styles.title}>
           {name}
         </Text>
@@ -37,8 +37,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center'
   },
+  tileIcon: {
+    minWidth: 25,
+    marginRight: 5
+  },
   title: {
-    marginLeft: 12,
     fontSize: 16,
   }
 })
