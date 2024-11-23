@@ -9,7 +9,7 @@ import {
 import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
-import { ArchiveEntryComponent } from '../components/ArchiveEntry';
+import { ArchiveTile } from '../components/ArchiveTile';
 import { Archive } from '../models'
 import { getDBConnection, createTable, getArchives, saveArchives, deleteArchive } from '../services/db-service';
 import uuid from 'react-native-uuid';
@@ -54,6 +54,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const handleCreateArchiveSubmit = () => {
     addArchive();
     // chain these actions?
+    setNewArchive('');
     handlePresentModalDismiss();
   };
 
@@ -61,13 +62,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     handlePresentModalPress();
     if (!newArchive.trim()) return;
     try {
-      const newArchives = [...archives as Archive[], {
-        id: uuid.v4() as string, name: newArchive
-      }];
+      const archive = { id: uuid.v4() as string, name: newArchive };
+      const newArchives = archives ? [...archives as Archive[], archive ] : [ archive ];
       updateState({ archives: newArchives });
       const db = await getDBConnection();
-      await saveArchives(db, newArchives)
-      setNewArchive('');
+      await saveArchives(db, newArchives);
     } catch (error) {
       console.error(error);
     }
@@ -91,7 +90,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     <BottomSheetModalProvider>
       <SafeAreaView>
         <ScrollView>
-          <View>
+          <View style={styles.archiveList}>
             {archives?.map((archive) => (
               <Pressable
                 key={archive.id}
@@ -99,7 +98,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   navigation.navigate('Archive', { archive: archive })
                 }
               >
-                <ArchiveEntryComponent key={archive.id} archive={archive} deleteArchiveEntry={deleteArchiveEntry} />
+                <ArchiveTile key={archive.id} archive={archive} />
               </Pressable>
             ))}
           </View>
@@ -137,6 +136,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 15,
     marginRight: 15
+  },
+  archiveList: {
+    flex: 1,
+    margin: 15,
   },
   textInput: {
     borderWidth: 1,
