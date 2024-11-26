@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { 
   Button, 
+  FlatList,
   Modal, 
   Pressable, 
-  SafeAreaView, 
-  ScrollView, 
+  SafeAreaView,
   StyleSheet, 
   TouchableOpacity, 
   View, 
@@ -20,10 +20,9 @@ import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList  } from '../navigation/types';
 import { getDBConnection, createTable, getItems, saveItems, deleteArchive } from '../services/db-service';
-import { ItemEntryComponent } from '../components/ItemEntryComponent';
+import { ItemTile } from '../components/ItemTile';
 import { Item } from '../models';
 import uuid from 'react-native-uuid';
-import { red } from 'react-native-reanimated/lib/typescript/Colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Archive'>;
 
@@ -114,21 +113,16 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <BottomSheetModalProvider>
-      <SafeAreaView>
-        <ScrollView>
-          <View>
-            {items.map((item) => (
-              <Pressable
-                key={item.id}
-                // onPress={() => 
-                //   navigation.navigate('Archive', { archive: archive })
-                // }
-              >
-                <ItemEntryComponent item={item} />
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
+      <SafeAreaView style={{flex: 1}}>
+        <FlatList 
+          data={items}
+          renderItem={({item, index}) => (
+            <ItemTile item={item} />
+          )} 
+          keyExtractor={item => item.id}
+          horizontal={false}
+          numColumns={2} 
+          style={styles.itemTileList} />
       </SafeAreaView>
       <Button
         onPress={handlePresentModalPress}
@@ -204,10 +198,17 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  itemTileList: {
+    margin: 15,
+  },
+  addNewItemButton: {
+    flex: 0.5,
+    height: 200,
+    marginVertical: 15,
+    marginHorizontal: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderColor: 'bbb',
+    borderRadius: 3,
   },
   modalContainer: {
     flex: 1,
