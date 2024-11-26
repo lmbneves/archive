@@ -116,8 +116,16 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
       <SafeAreaView style={{flex: 1}}>
         <FlatList 
           data={items}
-          renderItem={({item, index}) => (
-            <ItemTile item={item} />
+          renderItem={({item}) => (
+            <Pressable
+              key={item.id}
+              onPress={() => 
+                navigation.navigate('Item', { item: item })
+              }
+              style={styles.itemTileContainer}
+            >
+              <ItemTile item={item} />
+            </Pressable>
           )} 
           keyExtractor={item => item.id}
           horizontal={false}
@@ -200,6 +208,15 @@ const styles = StyleSheet.create({
   },
   itemTileList: {
     margin: 15,
+  },
+  itemTileContainer: {
+    flex: 0.5,
+    height: 200,
+    marginVertical: 15,
+    marginHorizontal: 10,
+    backgroundColor: 'white',
+    borderColor: 'bbb',
+    borderRadius: 3,
   },
   addNewItemButton: {
     flex: 0.5,
