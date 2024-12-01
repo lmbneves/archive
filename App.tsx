@@ -12,7 +12,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './src/navigation/types';
-import { HomeScreen, ArchiveScreen } from './src'
+import { HomeScreen, ArchiveScreen, ItemScreen } from './src'
 
 const Stack = createNativeStackNavigator<RootStackParamList>(); 
 
@@ -31,6 +31,13 @@ export default function App() {
               component={ ArchiveScreen }
               options={({ route }) => ({
                 title: route.params?.archive.name || 'Archive'
+              })}
+            />
+            <Stack.Screen
+              name="Item"
+              component={ ItemScreen }
+              options={({ route }) => ({
+                title: route.params?.item.name || 'Item'
               })}
             />
           </Stack.Navigator>

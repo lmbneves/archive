@@ -18,11 +18,12 @@ import {
 import { Trash2 } from 'lucide-react-native';
 import { AppContext } from '../context/app-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList  } from '../navigation/types';
+import { RootStackParamList } from '../navigation/types';
 import { getDBConnection, createTable, getItems, saveItems, deleteArchive } from '../services/db-service';
 import { ItemTile } from '../components/ItemTile';
 import { Item } from '../models';
 import uuid from 'react-native-uuid';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Archive'>;
 
@@ -54,6 +55,21 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
       console.error(error);
     }
   }, []);
+  const fetchData = async () => {
+    try {
+      const db = await getDBConnection();
+      // await createTable(db);
+      const storedItems = await getItems(db, route.params.archive.id);
+      if (storedItems.length) {
+        setItems(storedItems);
+      } else {
+        // await saveArchives(db, initArchives);
+        // setArchives(initArchives);
+      }
+    } catch (error) {
+      console.error(error);
+    }   
+  };
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -73,7 +89,9 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
     if (!newItem.trim()) return;
     try {
       const newItems = [...items, {
-        id: uuid.v4() as string, archive_id: route.params.archive.id, name: newItem
+        id: uuid.v4() as string, 
+        archive_id: route.params.archive.id, 
+        name: newItem
       }];
       setItems(newItems);
       const db = await getDBConnection();
@@ -110,14 +128,28 @@ const ArchiveScreen: React.FC<Props> = ({ navigation, route }) => {
       ),
     });
   }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
+  );
 
   return (
     <BottomSheetModalProvider>
       <SafeAreaView style={{flex: 1}}>
         <FlatList 
           data={items}
-          renderItem={({item, index}) => (
-            <ItemTile item={item} />
+          renderItem={({item}) => (
+            <Pressable
+              key={item.id}
+              onPress={() => 
+                navigation.navigate('Item', { item: item })
+              }
+              style={styles.itemTileContainer}
+            >
+              <ItemTile item={item} />
+              <Text>{item.notes}</Text>
+            </Pressable>
           )} 
           keyExtractor={item => item.id}
           horizontal={false}
@@ -200,6 +232,15 @@ const styles = StyleSheet.create({
   },
   itemTileList: {
     margin: 15,
+  },
+  itemTileContainer: {
+    flex: 0.5,
+    height: 200,
+    marginVertical: 15,
+    marginHorizontal: 10,
+    backgroundColor: 'white',
+    borderColor: 'bbb',
+    borderRadius: 3,
   },
   addNewItemButton: {
     flex: 0.5,

@@ -20,6 +20,7 @@ export const createTable = async (db: SQLiteDatabase) => {
     id TEXT PRIMARY KEY NOT NULL,
     archive_id TEXT NOT NULL,
     name TEXT NOT NULL,
+    notes TEXT,
     FOREIGN KEY (archive_id)
       REFERENCES Archive (id)
   ) WITHOUT ROWID;`);
@@ -57,7 +58,7 @@ export const deleteArchive = async (db: SQLiteDatabase, id: string) => {
 export const getItems = async (db: SQLiteDatabase, archive_id: string): Promise<Item[]> => {
   try {
     const items: Item[] = [];
-    const results = await db.executeSql(`SELECT id as id,name FROM ${itemTable} where archive_id = '${archive_id}'`);
+    const results = await db.executeSql(`SELECT id as id,name,archive_id,notes FROM ${itemTable} where archive_id = '${archive_id}'`);
     results.forEach((result: SQLiteDatabase) => { // idk about this type cast
       for (let index = 0; index < result.rows.length; index++) {
         items.push(result.rows.item(index))
@@ -76,6 +77,16 @@ export const saveItems = async (db: SQLiteDatabase, archive_id: string, items: I
     items.map(i => `('${i.id}', '${i.name}', '${archive_id}')`).join(',');
 
   return db.executeSql(insertQuery);
+};
+
+/**
+   * @todo pass in field name to save multiple and specific fields
+   */
+export const updateItem = async (db: SQLiteDatabase, item: Item) => {
+  const updateQuery =
+    `UPDATE ${itemTable} SET notes = '${item.notes}' WHERE id = '${item.id}'`;
+
+  return db.executeSql(updateQuery);
 };
 
 export const deleteItem = async (db: SQLiteDatabase, id: string) => {
